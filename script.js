@@ -57,6 +57,9 @@ function addDigit(d){
 }
 
 function addOperation(operator){
+    if (operation!==null)
+        sendOperate();
+    
     storedVariable=variable;
     variable="0";
     operationSign=operator;
@@ -74,6 +77,20 @@ function addOperation(operator){
         operation=divide;
     }
     return;
+}
+
+function clear(){
+    operation=null;
+    operationSign="";
+    storedVariable="";
+    variable="0";
+    return;
+}
+
+function sendOperate(){
+    const res=operate(operation,Number(storedVariable),Number(variable));
+    clear();
+    variable=String(res);
 }
 
 buttons.addEventListener("click", (event)=>{
@@ -95,4 +112,8 @@ buttons.addEventListener("click", (event)=>{
         UpdateDisplay();
     }
     
+    if (text==="="){
+        sendOperate();
+        UpdateDisplay();
+    }
 });
