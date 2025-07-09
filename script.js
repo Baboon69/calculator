@@ -1,4 +1,3 @@
-console.log("hey there!");
 const buttons = document.getElementById("buttons-container");
 const stored = document.getElementById("stored");
 const operationElement = document.getElementById("operation");
@@ -7,6 +6,7 @@ let operationSign="", storedVariableStr="";
 let operation=null, storedVariable=null, variable="0";
 let actualNumber,actualStoredNumber;
 let longFlag=false,resetFlag=false,operationUpdateFlag=false;
+let shiftDown=false;
 function UpdateDisplay(){
     if (!operation)
         operationElement.innerText="";
@@ -179,6 +179,7 @@ buttons.addEventListener("click", (event)=>{
         if (text==="."){
             addPoint();
             UpdateDisplay();
+            return;
         }
     }
 
@@ -189,17 +190,94 @@ buttons.addEventListener("click", (event)=>{
         addDigit(text);
         operationUpdateFlag=false;
         UpdateDisplay();
+        return;
     }
 
     if (operationsString.includes(text)){
         addOperation(text);
         operationUpdateFlag=true;
         UpdateDisplay();
+        return;
     }
     
     if (text==="="){
         sendOperate();
         UpdateDisplay();
         resetFlag=true;
+        return;
     }
 });
+
+document.addEventListener("keydown", (event) => {
+    const code=event.code;
+    if (resetFlag){
+        clear();
+    }
+
+    if (variable==="ERR")
+        return;
+
+    if (code.includes("Shift")){
+        shiftDown=true;
+        return;
+    }
+
+    if (code.includes("Backspace")){
+        backspace();
+        UpdateDisplay();
+        return;
+    }
+
+    if(!shiftDown){
+        if (code.includes("Period")){
+            addPoint();
+            UpdateDisplay();
+            return;
+        }
+        if (code.includes("Digit")){
+            addDigit(code.slice(-1));
+            operationUpdateFlag=false;
+            UpdateDisplay();
+            return;
+        }
+        if (code.includes("Slash")){
+            addOperation("/");
+            operationUpdateFlag=true;
+            UpdateDisplay();
+            return;
+        }
+        if (code.includes("Minus")){
+            addOperation("-");
+            operationUpdateFlag=true;
+            UpdateDisplay();
+            return;
+        }
+    }
+
+    if(shiftDown){
+        if (code.includes("Digit8")){
+            addOperation("*");
+            operationUpdateFlag=true;
+            UpdateDisplay();
+            return;
+        }
+        
+        if (code.includes("Equal")){
+            addOperation("+");
+            operationUpdateFlag=true;
+            UpdateDisplay();
+            return;
+        }
+    }
+
+    if(code.includes("Enter")){
+        sendOperate();
+        UpdateDisplay();
+        resetFlag=true;
+    }
+})
+
+document.addEventListener("keyup", (event) => {
+    if (event.code.includes("Shift"))
+        shiftDown=false;
+})
